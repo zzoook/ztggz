@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原始征途之鬼谷子</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+        }
+        body {
+            background-color: #f5f5f7;
+            padding: 10px;
+        }
+        /* 核心：原始征途标题样式（之字极致缩小） */
+        .title-wrap {
+            text-align: center;
+            margin: 15px 0;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .zt-main {
+            font-size: 36px;
+            color: #000;
+            position: relative;
+            text-shadow: 
+                2px 2px 0 #f9d050, 
+                -2px -2px 0 #f9d050,
+                2px -2px 0 #f9d050,
+                -2px 2px 0 #f9d050;
+            display: inline-block;
+        }
+        .ys-seal {
+            position: absolute;
+            top: -10px;
+            right: -40px;
+            width: 30px;
+            height: 30px;
+            background: #e53935;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 11px;
+            text-align: center;
+            line-height: 30px;
+            font-weight: 600;
+            text-shadow: none;
+            letter-spacing: 0;
+        }
+        /* 之字样式：极致缩小到18px */
+        .zhi-word {
+            font-size: 18px; /* 从22px→18px，满足"再小再小"要求 */
+            color: #000;
+            margin: 0 2px; /* 缩小间距，更紧凑 */
+            vertical-align: middle;
+            font-weight: normal;
+        }
+        /* 鬼谷子样式：金黄色 */
+        .guiguzi-word {
+            font-size: 36px;
+            color: #f9d050;
+            text-shadow: 1px 1px 0 #000;
+            vertical-align: middle;
+        }
+        /* 数字键盘容器 */
+        .keyboard-wrap {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        /* 数字按钮网格 */
+        .num-keyboard {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .num-btn {
+            padding: 18px 0;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--btn-color-start), var(--btn-color-end));
+            touch-action: manipulation;
+        }
+        /* 数字按钮配色（精准匹配截图） */
+        .num-1 {--btn-color-start: #4cc0b2; --btn-color-end: #3aa89b;}
+        .num-2 {--btn-color-start: #7dd8e0; --btn-color-end: #6bc6ce;}
+        .num-3 {--btn-color-start: #f9d050; --btn-color-end: #e8be40;}
+        .num-4 {--btn-color-start: #8066e0; --btn-color-end: #6e54cc;}
+        .num-5 {--btn-color-start: #a288f5; --btn-color-end: #9076e1;}
+        .num-6 {--btn-color-start: #f879b5; --btn-color-end: #e768a4;}
+        .num-7 {--btn-color-start: #f9b06f; --btn-color-end: #e89e5e;}
+        .num-8 {--btn-color-start: #3cc98c; --btn-color-end: #2bb87b;}
+        .num-9 {--btn-color-start: #e86c57; --btn-color-end: #d75b46;}
+        .num-0 {--btn-color-start: #f8687a; --btn-color-end: #e75769;}
+        /* 重置按钮 */
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #f8d7da, #f1c6cb);
+            border: none;
+            border-radius: 8px;
+            color: #721c24;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .reset-icon {
+            font-size: 18px;
+        }
+        /* 概率对应表 */
+        .prob-table-wrap {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .prob-table-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .prob-table {
+            width: 100%;
+        }
+        .prob-table th {
+            text-align: left;
+            font-weight: 500;
+            color: #666;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .prob-table td {
+            padding: 8px 0;
+            font-size: 15px;
+            color: #333;
+        }
+        .prob-num {
+            color: #007aff;
+            font-weight: 500;
+        }
+        .suggest-tag {
+            display: inline-block;
+            background: #e5edff;
+            color: #007aff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 4px;
+            font-size: 14px;
+        }
+        /* 核心：统计+历史分析容器 完全固定尺寸 */
+        .data-wrap {
+            display: flex;
+            gap: 10px;
+            height: 420px;
+            width: 100%;
+        }
+        .stat-result, .history-analysis {
+            flex: 1;
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: 100%;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+        }
+        .data-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            flex-shrink: 0;
+        }
+        /* 统计结果列表 - 固定容器，内部滚动 */
+        .stat-list {
+            font-size: 15px;
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+        .stat-num {
+            color: #007aff;
+            font-weight: 500;
+        }
+        /* 历史分析内容区 - 固定容器，内部滚动 */
+        .history-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* 历史时间轴 - 核心：文字独占一行，数字下方完整显示 */
+        .history-timeline {
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+        .timeline-label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .timeline-scroll-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 8px;
+            width: 100%;
+        }
+        /* 自定义滚动条 */
+        .timeline-scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        .timeline-scroll-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        .timeline-scroll-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .timeline-scroll-container {
+            scrollbar-width: thin;
+            scrollbar-color: #c1c1c1 #f1f1f1;
+        }
+        .timeline-tag {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            border-radius: 50%;
+            color: white;
+            font-size: 12px;
+            margin-right: 6px;
+        }
+        /* 时间轴标签配色（和数字按钮完全匹配） */
+        .timeline-tag-1 {background: #4cc0b2;}
+        .timeline-tag-2 {background: #7dd8e0;}
+        .timeline-tag-3 {background: #f9d050;}
+        .timeline-tag-4 {background: #8066e0;}
+        .timeline-tag-5 {background: #a288f5;}
+        .timeline-tag-6 {background: #f879b5;}
+        .timeline-tag-7 {background: #f9b06f;}
+        .timeline-tag-8 {background: #3cc98c;}
+        .timeline-tag-9 {background: #e86c57;}
+        .timeline-tag-0 {background: #f8687a;}
+        .history-text {
+            font-size: 14px;
+            color: #333;
+            margin: 8px 0;
+        }
+        .no-appear-tag {
+            display: inline-block;
+            background: #ffebee;
+            color: #e53935;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 标题：征途+原始印章+之鬼谷子（之字极致缩小） -->
+    <div class="title-wrap">
+        <span class="zt-main">征途
+            <span class="ys-seal">原始</span>
+        </span>
+        <span class="zhi-word">之</span>
+        <span class="guiguzi-word">鬼谷子</span>
+    </div>
+    
+    <!-- 数字键盘 -->
+    <div class="keyboard-wrap">
+        <div class="num-keyboard">
+            <button class="num-btn num-1">1</button>
+            <button class="num-btn num-2">2</button>
+            <button class="num-btn num-3">3</button>
+            <button class="num-btn num-4">4</button>
+            <button class="num-btn num-5">5</button>
+            <button class="num-btn num-6">6</button>
+            <button class="num-btn num-7">7</button>
+            <button class="num-btn num-8">8</button>
+            <button class="num-btn num-9">9</button>
+            <button class="num-btn num-0">0</button>
+        </div>
+        <button class="reset-btn" id="resetBtn">
+            <span class="reset-icon">🔄</span> 重置
+        </button>
+    </div>
+
+    <!-- 概率对应表 -->
+    <div class="prob-table-wrap">
+        <div class="prob-table-title">概率对应表</div>
+        <table class="prob-table">
+            <thead>
+                <tr>
+                    <th width="30%">当前数字</th>
+                    <th width="40%">高概率对应数字</th>
+                    <th width="30%">围号建议</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="probRow">
+                    <td></td>
+                    <td>请输入数字查看对应概率</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 统计+历史分析（固定尺寸） -->
+    <div class="data-wrap">
+        <div class="stat-result">
+            <div class="data-title">统计结果（近30次）</div>
+            <div class="stat-list" id="statList"></div>
+        </div>
+        <div class="history-analysis">
+            <div class="data-title">历史分析</div>
+            <div class="history-content">
+                <div class="history-timeline">
+                    <div class="timeline-label">历史时间轴</div>
+                    <div class="timeline-scroll-container" id="timelineScrollContainer">
+                        <div id="timelineContent"></div>
+                    </div>
+                </div>
+                <div class="history-text">20次未出现（近30次内）</div>
+                <div id="noAppear20"></div>
+                <div class="history-text">30次未出现（近30次内）</div>
+                <div id="noAppear30"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 概率规则
+        const probRules = {
+            0: { highProb: '2, 5, 4, 7, 9', suggest: ['2', '4'] },
+            1: { highProb: '2, 3, 6, 8, 9', suggest: ['3', '8'] },
+            2: { highProb: '3, 4, 1, 5, 0', suggest: ['0', '4'] },
+            3: { highProb: '1, 2, 4, 7, 6', suggest: ['4', '7'] },
+            4: { highProb: '8, 2, 6, 5, 1', suggest: ['2', '5'] },
+            5: { highProb: '2, 4, 7, 0, 9', suggest: ['2', '4'] },
+            6: { highProb: '1, 4, 9, 5, 8', suggest: ['4', '8'] },
+            7: { highProb: '0, 2, 3, 4, 6', suggest: ['4', '3'] },
+            8: { highProb: '1, 3, 5, 6, 9', suggest: ['5', '9'] },
+            9: { highProb: '4, 6, 8, 0, 1', suggest: ['6', '8'] }
+        };
+
+        // 初始化数据
+        const clickHistory = [];
+        const recent30Clicks = [];
+
+        // DOM元素
+        const statList = document.getElementById('statList');
+        const probRow = document.getElementById('probRow');
+        const timelineContent = document.getElementById('timelineContent');
+        const timelineScrollContainer = document.getElementById('timelineScrollContainer');
+        const noAppear20 = document.getElementById('noAppear20');
+        const noAppear30 = document.getElementById('noAppear30');
+
+        // 1. 渲染统计列表
+        function renderStat() {
+            const count = {0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
+            recent30Clicks.forEach(num => count[num]++);
+            statList.innerHTML = '';
+            for(let i=0; i<=9; i++) {
+                statList.innerHTML += `
+                    <div class="stat-item">
+                        <span class="stat-num">${i}</span>
+                        <span>${count[i]} 次</span>
+                    </div>
+                `;
+            }
+        }
+
+        // 2. 渲染概率对应表
+        function renderProb(num) {
+            const rule = probRules[num];
+            const suggestHtml = rule.suggest.map(s => `<span class="suggest-tag">${s}</span>`).join('');
+            probRow.innerHTML = `
+                <td class="prob-num">${num}</td>
+                <td>${rule.highProb}</td>
+                <td>${suggestHtml}</td>
+            `;
+        }
+
+        // 3. 渲染时间轴
+        function renderTimeline() {
+            if (clickHistory.length === 0) {
+                timelineContent.innerHTML = '';
+                return;
+            }
+
+            let timelineHtml = '';
+            clickHistory.forEach((num, index) => {
+                timelineHtml += `<span class="timeline-tag timeline-tag-${num}">${num}</span>`;
+                if (index !== clickHistory.length - 1) {
+                    timelineHtml += '-';
+                }
+            });
+            timelineContent.innerHTML = timelineHtml;
+
+            setTimeout(() => {
+                timelineScrollContainer.scrollLeft = timelineScrollContainer.scrollWidth;
+            }, 10);
+        }
+
+        // 4. 渲染未出现数字
+        function renderNoAppear() {
+            const appearedNums = new Set(recent30Clicks);
+            const noAppearNums = [];
+            for(let i=0; i<=9; i++) {
+                if (!appearedNums.has(i)) noAppearNums.push(i);
+            }
+            const noAppearHtml = noAppearNums.map(n => `<span class="no-appear-tag">${n}</span>`).join('');
+            noAppear20.innerHTML = noAppearHtml;
+            noAppear30.innerHTML = noAppearHtml;
+        }
+
+        // 5. 数字按钮点击事件
+        document.querySelectorAll('.num-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const num = parseInt(this.textContent);
+                clickHistory.push(num);
+                recent30Clicks.push(num);
+                if (recent30Clicks.length > 30) recent30Clicks.shift();
+                renderStat();
+                renderProb(num);
+                renderTimeline();
+                renderNoAppear();
+            });
+        });
+
+        // 6. 重置按钮
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            clickHistory.length = 0;
+            recent30Clicks.length = 0;
+            renderStat();
+            probRow.innerHTML = '<td></td><td>请输入数字查看对应概率</td><td></td>';
+            renderTimeline();
+            renderNoAppear();
+        });
+
+        // 初始化
+        renderStat();
+        renderTimeline();
+        renderNoAppear();
+    </script>
+</body>
+</html>
